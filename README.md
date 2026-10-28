@@ -54,23 +54,16 @@ const data = await fileClient.read("/public/my-page")
 data.FileStream.pipe(process.stdout)
 ```
 
-## Distribute content from your file service
+## Load balance and distribute content from your file service
 ```javascript
 const FileLoadBalancer = require("presidium-file-client-server/FileLoadBalancer")
 
-function hash(filePath, length) {
-  const digest = crypto.createHash("md5").update(filePath).digest()
-  const integerHash = digest.readUInt16BE(0)
-  const index = Math.floor(integerHash / 65535 * length)
-  return index
-}
-
-const loadBalancer = new DatabaseLoadBalancer(hash, {
+const loadBalancer = new DatabaseLoadBalancer({
   serverIps: ["10.0.0.1:8080", "10.0.0.2:8080"],
 })
 
-loadBalancer.listen(6333, () => {
-  console.log("Database load balancer listening on port 6333")
+loadBalancer.listen(9000, () => {
+  console.log("Database load balancer listening on port 9000")
 })
 ```
 
