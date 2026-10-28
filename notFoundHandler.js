@@ -1,4 +1,8 @@
 /**
+ * Presidium File Client and Server may be freely distributed under the CFOSS license.
+ */
+
+/**
  * @name notFoundHandler
  *
  * @docs

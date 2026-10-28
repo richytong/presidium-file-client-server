@@ -1,3 +1,7 @@
+/**
+ * Presidium File Client and Server may be freely distributed under the CFOSS license.
+ */
+
 require("rubico/global")
 const http = require("http")
 const DiskHashTable = require("presidium/DiskHashTable")

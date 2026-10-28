@@ -1,3 +1,7 @@
+/**
+ * Presidium File Client and Server may be freely distributed under the CFOSS license.
+ */
+
 const HTTP = require("presidium/HTTP")
 const Readable = require("presidium/Readable")
 const stream = require("stream")

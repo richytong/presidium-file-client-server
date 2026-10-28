@@ -1,3 +1,7 @@
+/**
+ * Presidium File Client and Server may be freely distributed under the CFOSS license.
+ */
+
 const fs = require("fs")
 const os = { path: require("path") }
 
