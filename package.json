@@ -1,6 +1,6 @@
 {
   "name": "presidium-file-client-server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Presidium file client and server",
   "author": "Richard Tong",
   "license": "CFOSS",
