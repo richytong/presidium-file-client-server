@@ -32,7 +32,7 @@
     "javascript"
   ],
   "scripts": {
-    "test": "node test.js"
+    "test": "node test"
   },
   "dependencies": {
     "presidium": ">=4.9.1",
