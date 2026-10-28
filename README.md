@@ -78,11 +78,11 @@ loadBalancer.listen(6333, () => {
 
 with [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm):
 ```bash
-npm i presidium-db-client-server
+npm i presidium-file-client-server
 ```
 
 ## License
-Presidium DB Client and Server is distributed under the [CFOSS License](https://cloutsworld.com/en-us/legal/license/cfoss).
+Presidium File Client and Server is distributed under the [CFOSS License](https://cloutsworld.com/en-us/legal/license/cfoss).
 
 ## Support
  * minimum Node.js version: 16
