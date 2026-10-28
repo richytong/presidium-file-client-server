@@ -16,6 +16,7 @@
     "deleteFileHandler.js",
     "errorHandler.js",
     "healthCheckHandler.js",
+    "hash.js",
     "loadBalancerHandler.js",
     "notFoundHandler.js",
     "optionsHandler.js",
