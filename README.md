@@ -27,7 +27,7 @@ fileServer.listen(9000, () => {
 
 ## Call your file service
 ```javascript
-const DiskHashTableClient = require("presidium-file-client-server/FileClient")
+const FileClient = require("presidium-file-client-server/FileClient")
 
 const fileClient = new FileClient({
   serverUrl: "http://localhost:9000",
