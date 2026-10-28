@@ -15,8 +15,7 @@ async function test0() {
 
   const server = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata/header`,
+    databasePath: `${__dirname}/database`,
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   })
@@ -93,8 +92,7 @@ async function test1() {
 
   const server1 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-1`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata1/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata1/header`,
+    databasePath: `${__dirname}/database`,
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   }, request => {
@@ -106,8 +104,7 @@ async function test1() {
 
   const server2 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-2`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata2/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata2/header`,
+    databasePath: `${__dirname}/database`,
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   }, request => {
@@ -119,8 +116,7 @@ async function test1() {
 
   const server3 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-3`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata3/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata3/header`,
+    databasePath: `${__dirname}/database`,
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   }, request => {
@@ -238,8 +234,8 @@ async function test2() {
 
   const server1 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-1`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata1/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata1/header`,
+    databasePath: `${__dirname}/database`,
+    metadataTableName: "Metadata",
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   })
@@ -249,8 +245,8 @@ async function test2() {
 
   const server2 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-2`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata2/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata2/header`,
+    databasePath: `${__dirname}/database`,
+    metadataTableName: "Metadata",
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   })
@@ -260,8 +256,8 @@ async function test2() {
 
   const server3 = new FileServer({
     dir: `${__dirname}/file-root/file-load-balancer/file-server-3`,
-    metadataTableStoragePath: `${__dirname}/database/Metadata3/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata3/header`,
+    databasePath: `${__dirname}/database`,
+    metadataTableName: "Metadata",
     metadataTableInitialLength: 1024,
     metadataTableItemSize: 1024,
   })
