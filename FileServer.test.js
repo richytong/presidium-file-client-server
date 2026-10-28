@@ -9,10 +9,7 @@ const FileServer = require("./FileServer")
 async function test0() {
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
-    metadataTableInitialLength: 1048576,
-    metadataTableItemSize: 512,
-    metadataTableStoragePath: `${__dirname}/database/Metadata/storage`,
-    metadataTableHeaderPath: `${__dirname}/database/Metadata/header`,
+    databasePath: `${__dirname}/database`,
   })
   await fileServer.init()
 

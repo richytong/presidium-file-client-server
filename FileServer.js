@@ -20,8 +20,7 @@ const errorHandler = require("./errorHandler")
  *
  * FileServer(options {
  *   dir: string,
- *   metadataTableStoragePath: string,
- *   metadataTableHeaderPath: string,
+ *   databasePath: string,
  *   metadataTableInitialLength: number,
  *   metadataTableItemSize: number,
  * }, ...handlers Array<HttpHandler>) -> FileServer
@@ -30,10 +29,11 @@ const errorHandler = require("./errorHandler")
 class FileServer {
   constructor(options, ...handlers) {
     this.dir = options.dir
-    this.metadataTableStoragePath = options.metadataTableStoragePath
-    this.metadataTableHeaderPath = options.metadataTableHeaderPath
-    this.metadataTableInitialLength = options.metadataTableInitialLength
-    this.metadataTableItemSize = options.metadataTableItemSize
+    this.databasePath = options.databasePath
+    this.metadataTableName = options.manifestTableName ?? "Metadata"
+    this.metadataTableInitialLength = options.manifestTableInitialLength ?? 1048576
+    this.metadataTableItemSize = options.manifestTableItemSize ?? 1024
+
     this.handlers = handlers
   }
 
@@ -47,8 +47,8 @@ class FileServer {
    */
   async init() {
     const metadataHt = new DiskHashTable({
-      storagePath: this.metadataTableStoragePath,
-      headerPath: this.metadataTableHeaderPath,
+      storagePath: `${this.databasePath}/${this.manifestTableName}/storage`,
+      headerPath: `${this.databasePath}/${this.manifestTableName}/header`,
       initialLength: this.metadataTableInitialLength,
       itemSize: this.metadataTableItemSize,
     })
