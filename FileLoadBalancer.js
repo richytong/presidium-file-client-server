@@ -15,16 +15,20 @@ const defaultHash = require("./hash")
  *
  * @docs
  * ```specscript
- * module HTTP "https://presidium.services/docs/HTTP"
+ * module http "https://nodejs.org/api/http.html"
  *
- * HTTP.Handler(HTTP.Request, HTTP.Response) -> ()
+ * HttpHandler(http.ClientRequest, http.ServerResponse) -> Promise<>|undefined
+ *
+ * new FileLoadBalancer(options {
+ *   serverIps: Array<string>|Array<Array<string>>,
+ * }, ...handlers Arguments<HttpHandler>) -> FileLoadBalancer
  *
  * new FileLoadBalancer(
- *   hash(fileUrl string, serverIpsLength number) -> Promise|number,
+ *   hash(fileUrl string, serverIpsLength number) -> serverIndex Promise|number,
  *   options {
  *     serverIps: Array<string>|Array<Array<string>>,
  *   },
- *   ...handlers Arguments<HTTP.Handler>
+ *   ...handlers Arguments<HttpHandler>
  * ) -> FileLoadBalancer
  * ```
  */
