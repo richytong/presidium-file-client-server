@@ -1,3 +1,4 @@
 node_modules
 database
 file-root
+.nyc_output

@@ -1,11 +1,18 @@
 const assert = require("assert")
 const stream = require("stream")
 const zlib = require("zlib")
+const http = require("http")
 const Readable = require("presidium/Readable")
 const FileServer = require("./FileServer")
 const FileClient = require("./FileClient")
 
 async function test0() {
+  try {
+    await fs.promises.rm(`${__dirname}/database`, { recursive: true })
+    await fs.promises.rm(`${__dirname}/file-root`, { recursive: true })
+  } catch {
+  }
+
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
@@ -82,8 +89,47 @@ async function test0() {
   fileServer.close()
 }
 
+async function test1() {
+  try {
+    await fs.promises.rm(`${__dirname}/database`, { recursive: true })
+    await fs.promises.rm(`${__dirname}/file-root`, { recursive: true })
+  } catch {
+  }
+
+  const fileServer = http.createServer((request, response) => {
+    response.writeHead(500, {
+      "Content-Type": "text/plain",
+    })
+    response.end("Internal Server Error")
+  })
+
+  fileServer.listen(7358)
+
+  const fileClient = new FileClient({
+    serverUrl: 'localhost:7358',
+  })
+
+  await assert.rejects(
+    () => fileClient.write("/a", "1"),
+    new Error("Internal Server Error")
+  )
+
+  await assert.rejects(
+    () => fileClient.read("/a"),
+    new Error("Internal Server Error")
+  )
+
+  await assert.rejects(
+    () => fileClient.delete("/a"),
+    new Error("Internal Server Error")
+  )
+
+  fileServer.close()
+}
+
 async function test() {
   await test0()
+  await test1()
   console.log("Success")
 }
 

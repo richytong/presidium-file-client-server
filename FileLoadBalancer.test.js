@@ -368,6 +368,11 @@ async function test3() {
   assert.equal(errors[0].message, "Test Internal Server Error")
   assert.equal(errors[1].message, "Test Internal Server Error")
 
+  await assert.rejects(
+    () => fileClient1.write("/"),
+    new Error("Internal Server Error")
+  )
+
   console.error = consoleError
 
   loadBalancer.close()

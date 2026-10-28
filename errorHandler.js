@@ -20,7 +20,7 @@ function errorHandler(error, request, response) {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'text/plain',
   })
-  response.end(error.message)
+  response.end("Internal Server Error")
 }
 
 module.exports = errorHandler

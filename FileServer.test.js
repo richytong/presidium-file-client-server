@@ -7,6 +7,12 @@ const zlib = require("zlib")
 const FileServer = require("./FileServer")
 
 async function test0() {
+  try {
+    await fs.promises.rm(`${__dirname}/database`, { recursive: true })
+    await fs.promises.rm(`${__dirname}/file-root`, { recursive: true })
+  } catch {
+  }
+
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
