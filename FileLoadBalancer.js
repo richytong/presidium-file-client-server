@@ -1,0 +1,90 @@
+require("rubico/global")
+const HTTP = require("presidium/HTTP")
+const loadBalancerHandler = require("./loadBalancerHandler")
+const healthCheckHandler = require("./healthCheckHandler")
+const notFoundHandler = require("./notFoundHandler")
+const errorHandler = require("./errorHandler")
+
+/**
+ * @name FileLoadBalancer
+ *
+ * @docs
+ * ```specscript
+ * module HTTP "https://presidium.services/docs/HTTP"
+ *
+ * HTTP.Handler(HTTP.Request, HTTP.Response) -> ()
+ *
+ * new FileLoadBalancer(
+ *   hash(fileUrl string, serverIpsLength number) -> Promise|number,
+ *   options {
+ *     serverIps: Array<string>|Array<Array<string>>,
+ *   },
+ *   ...handlers Arguments<HTTP.Handler>
+ * ) -> FileLoadBalancer
+ * ```
+ */
+class FileLoadBalancer {
+  constructor(hash, options, ...handlers) {
+    this.hash = hash
+    this.serverIps = options.serverIps
+    this.handlers = handlers
+    this.clients = new Map()
+    this.closed = false
+
+    const router = tryCatch(
+      switchCase(
+        request => request.path == "/health",
+        healthCheckHandler,
+
+        curry.call(loadBalancerHandler, this),
+      ),
+      errorHandler
+    )
+
+    const handler = all.series([
+      ...this.handlers,
+      request => {
+        const { pathname } = new URL(`http://*${request.url}`)
+        request.path = decodeURIComponent(
+          pathname == "/" ? pathname
+          : pathname.endsWith("/") ? pathname.slice(0, -1)
+          : pathname
+        )
+        request.pathSegments = request.path.slice(1).split("/")
+        request.pathDepth = request.pathSegments.length
+      },
+      router,
+    ])
+
+    this.server = HTTP.Server(handler)
+  }
+
+  /**
+   * @name listen
+   *
+   * @docs
+   * ```specscript
+   * listen(port number) -> ()
+   * listen(port number, callback function) -> ()
+   * ```
+   */
+  listen(port, callback) {
+    this.server.listen(port, callback)
+  }
+
+  /**
+   * @name close
+   *
+   * @docs
+   * ```specscript
+   * close() -> ()
+   * ```
+   */
+  close() {
+    this.server.close()
+    this.closed = true
+  }
+
+}
+
+module.exports = FileLoadBalancer

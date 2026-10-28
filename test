@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+const tests = [
+  require("./FileClient.test.js"),
+  require("./FileServer.test.js"),
+  require("./FileLoadBalancer.test.js"),
+]
+
+async function test() {
+  for (const test of tests) {
+    process.env.NODE_ENV = "test"
+    await test()
+  }
+}
+
+if (process.argv[1] == __filename) {
+  process.env.NODE_ENV = "test"
+  test()
+}
+
+module.exports = test
