@@ -4,6 +4,7 @@ const loadBalancerHandler = require("./loadBalancerHandler")
 const healthCheckHandler = require("./healthCheckHandler")
 const notFoundHandler = require("./notFoundHandler")
 const errorHandler = require("./errorHandler")
+const defaultHash = require("./hash")
 
 /**
  * @name FileLoadBalancer
@@ -25,7 +26,13 @@ const errorHandler = require("./errorHandler")
  */
 class FileLoadBalancer {
   constructor(hash, options, ...handlers) {
-    this.hash = hash
+    if (typeof hash == "function") {
+      this.hash = hash
+    } else {
+      this.hash = defaultHash
+      handlers.shift(options)
+      options = hash
+    }
     this.serverIps = options.serverIps
     this.handlers = handlers
     this.clients = new Map()

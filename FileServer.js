@@ -33,7 +33,6 @@ class FileServer {
     this.metadataTableName = options.manifestTableName ?? "Metadata"
     this.metadataTableInitialLength = options.manifestTableInitialLength ?? 1048576
     this.metadataTableItemSize = options.manifestTableItemSize ?? 1024
-
     this.handlers = handlers
   }
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const tests = [
+  require("./hash.test.js"),
   require("./FileClient.test.js"),
   require("./FileServer.test.js"),
   require("./FileLoadBalancer.test.js"),
