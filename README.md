@@ -58,7 +58,7 @@ data.FileStream.pipe(process.stdout)
 ```javascript
 const FileLoadBalancer = require("presidium-file-client-server/FileLoadBalancer")
 
-const loadBalancer = new DatabaseLoadBalancer({
+const loadBalancer = new FileLoadBalancer({
   serverIps: ["10.0.0.1:8080", "10.0.0.2:8080"],
 })
 
