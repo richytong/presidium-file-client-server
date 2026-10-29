@@ -17,19 +17,17 @@ const defaultHash = require("./hash")
  * ```specscript
  * module http "https://nodejs.org/api/http.html"
  *
- * HttpHandler(http.ClientRequest, http.ServerResponse) -> Promise<>|undefined
+ * type HttpHandler(http.ClientRequest, http.ServerResponse) -> Promise<>|undefined
  *
  * new FileLoadBalancer(options {
  *   serverIps: Array<string>|Array<Array<string>>,
  * }, ...handlers Arguments<HttpHandler>) -> FileLoadBalancer
  *
- * new FileLoadBalancer(
- *   hash(fileUrl string, serverIpsLength number) -> serverIndex Promise|number,
- *   options {
- *     serverIps: Array<string>|Array<Array<string>>,
- *   },
- *   ...handlers Arguments<HttpHandler>
- * ) -> FileLoadBalancer
+ * hash(fileUrl string, serverIpsLength number) -> serverIndex Promise|number
+ *
+ * new FileLoadBalancer(hash, options {
+ *   serverIps: Array<string>|Array<Array<string>>,
+ * }, ...handlers Arguments<HttpHandler>) -> FileLoadBalancer
  * ```
  */
 class FileLoadBalancer {

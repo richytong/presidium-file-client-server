@@ -20,9 +20,9 @@ const errorHandler = require("./errorHandler")
  * ```specscript
  * module http "https://nodejs.org/api/http.html"
  *
- * HttpHandler(request http.ClientRequest, response http.ServerResponse) -> ()
+ * type HttpHandler(request http.ClientRequest, response http.ServerResponse) -> ()
  *
- * FileServer(options {
+ * new FileServer(options {
  *   dir: string,
  *   databasePath: string,
  *   metadataTableInitialLength: number,
