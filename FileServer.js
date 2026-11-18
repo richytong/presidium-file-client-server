@@ -27,6 +27,7 @@ const errorHandler = require("./errorHandler")
  *   databasePath: string,
  *   metadataTableInitialLength: number,
  *   metadataTableItemSize: number,
+ *   cors: boolean,
  * }, ...handlers Array<HttpHandler>) -> FileServer
  * ```
  */
@@ -37,6 +38,7 @@ class FileServer {
     this.metadataTableName = options.manifestTableName ?? "Metadata"
     this.metadataTableInitialLength = options.manifestTableInitialLength ?? 1048576
     this.metadataTableItemSize = options.manifestTableItemSize ?? 1024
+    this.cors = options.cors
     this.handlers = handlers
   }
 

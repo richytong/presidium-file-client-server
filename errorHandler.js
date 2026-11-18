@@ -21,7 +21,6 @@ function errorHandler(error, request, response) {
     error.code = 500
   }
   response.writeHead(error.code, {
-    'Access-Control-Allow-Origin': '*',
     'Content-Type': 'text/plain',
   })
   response.end("Internal Server Error")

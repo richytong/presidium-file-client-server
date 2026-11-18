@@ -30,6 +30,9 @@ async function readFileHandler(request, response) {
   const responseHeaders = {
     "Content-Length": metadata.ContentLength,
     "Content-Type": metadata.ContentType,
+    ...this.cors ? {
+      'Access-Control-Allow-Origin': '*',
+    } : {},
   }
   if (metadata.ContentEncoding) {
     responseHeaders["Content-Encoding"] = metadata.ContentEncoding

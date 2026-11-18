@@ -16,6 +16,9 @@ async function test0() {
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
+    metadataTableName: "Metadata",
+    metadataTableInitialLength: 1048576,
+    metadataTableItemSize: 1024,
   })
   await fileServer.init()
 
@@ -115,18 +118,81 @@ async function test0() {
   assert.equal(response8.status, 404)
   const text8 = await Readable.Text(response8)
   assert.equal(text8, "Not Found")
-  
+
+  fileServer.close()
+}
+
+async function test1() {
+  try {
+    await fs.promises.rm(`${__dirname}/database`, { recursive: true })
+    await fs.promises.rm(`${__dirname}/file-root`, { recursive: true })
+  } catch {
+  }
+
+  const fileServer = new FileServer({
+    dir: `${__dirname}/file-root/test-dir`,
+    databasePath: `${__dirname}/database`,
+    cors: true,
+  })
+  await fileServer.init()
+
+  fileServer.listen(7358)
+
+  const { metadataHt } = fileServer
+
+  const http = new HTTP('localhost:7358')
+
+  const response1 = await http.GET("/health")
+  assert.equal(response1.status, 200)
+  const text1 = await Readable.Text(response1)
+  assert.equal(text1, "OK")
+
+  const response2 = await http.OPTIONS("/")
+  assert.equal(response2.status, 204)
+  const text2 = await Readable.Text(response2)
+  assert.equal(text2, "")
+
+  const filePath1 = "/media/test-1.mp4"
+  const testBuffer1 = Buffer.from([1, 2, 3])
+
+  const response3 = await http.PUT(`/${filePath1}`, {
+    body: testBuffer1,
+  })
+  assert.equal(response3.status, 200)
+  const data3 = await Readable.JSON(response3)
+  assert.equal(data3.Url, filePath1)
+  assert.equal(data3.ContentType, "application/octet-stream")
+  assert.equal(data3.ContentLength, Buffer.byteLength(testBuffer1))
+
+  const response4 = await http.GET(`/${filePath1}`)
+  assert.equal(response4.status, 200)
+  assert.equal(response4.headers["content-type"], "application/octet-stream")
+  assert.equal(response4.headers["content-length"], Buffer.byteLength(testBuffer1))
+  assert.equal(response4.headers["access-control-allow-origin"], "*")
+  const data4 = await Readable.Buffer(response4)
+  assert(testBuffer1.equals(data4))
+
+  const response41 = await http.DELETE(`/${filePath1}`)
+  assert.equal(response41.status, 200)
+  const message41 = await Readable.Text(response41)
+  assert.equal(message41, "OK")
+
+  const response42 = await http.DELETE(`/${filePath1}`)
+  assert.equal(response42.status, 404)
+  const message42 = await Readable.Text(response42)
+  assert.equal(message42, "Not Found")
+
   fileServer.close()
 }
 
 async function test() {
   await test0()
+  await test1()
   console.log("Success")
 }
 
 if (process.argv[1] == __filename) {
   process.env.NODE_ENV = "test"
-  require("./set-global")
   test()
 }
 
