@@ -3,7 +3,7 @@
  */
 
 require("rubico/global")
-const fs = require("fs")
+const { access, rm } = require("fs/promises")
 const os = { path: require("path") }
 const notFoundHandler = require("./notFoundHandler")
 
@@ -21,13 +21,13 @@ async function deleteFileHandler(request, response) {
   const relativeFilePath = request.pathSegments.join("/")
   const filePath = os.path.join(this.dir, relativeFilePath)
 
-  const metadataJson = await this.metadataHt.get(filePath)
-  if (metadataJson == null) {
+  try {
+    await access(filePath)
+  } catch {
     return notFoundHandler(request, response)
   }
 
-  await this.metadataHt.delete(filePath)
-  await fs.promises.rm(filePath)
+  await rm(filePath)
 
   response.writeHead(200, {
     "Content-Type": "text/plain",

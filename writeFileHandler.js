@@ -3,6 +3,7 @@
  */
 
 const fs = require("fs")
+const { mkdir } = require("fs/promises")
 const os = { path: require("path") }
 
 /**
@@ -20,18 +21,17 @@ async function writeFileHandler(request, response) {
   const filePath = os.path.join(this.dir, relativeFilePath)
 
   const fileDir = filePath.split("/").slice(0, -1).join("/")
-  await fs.promises.mkdir(fileDir, { recursive: true })
+  await mkdir(fileDir, { recursive: true })
   const fileWriteStream = fs.createWriteStream(filePath)
 
   let contentLength = 0
-  request.pipe(fileWriteStream)
   request.on("data", chunk => {
     contentLength += Buffer.byteLength(chunk)
+    fileWriteStream.write(chunk)
   })
 
-  await new Promise((resolve, reject) => {
-    fileWriteStream.on("finish", resolve)
-    fileWriteStream.on("error", reject)
+  await new Promise(resolve => {
+    request.on("end", resolve)
   })
 
   const metadata = {
@@ -46,8 +46,16 @@ async function writeFileHandler(request, response) {
   if (request.headers["content-encoding"]) {
     metadata.ContentEncoding = request.headers["content-encoding"]
   }
+
   const metadataJson = JSON.stringify(metadata)
-  await this.metadataHt.set(filePath, metadataJson)
+  fileWriteStream.write(Buffer.from(this.delimiter, "utf8"))
+  fileWriteStream.write(Buffer.from(metadataJson, "utf8"))
+  fileWriteStream.end()
+
+  await new Promise((resolve, reject) => {
+    fileWriteStream.on("finish", resolve)
+    fileWriteStream.on("error", reject)
+  })
 
   response.writeHead(200, {
     "Content-Type": "application/json",

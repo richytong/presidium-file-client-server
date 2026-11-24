@@ -16,15 +16,9 @@ async function test0() {
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
-    metadataTableName: "Metadata",
-    metadataTableInitialLength: 1048576,
-    metadataTableItemSize: 1024,
   })
-  await fileServer.init()
 
   fileServer.listen(7357)
-
-  const { metadataHt } = fileServer
 
   const http = new HTTP('localhost:7357')
 
@@ -137,8 +131,6 @@ async function test1() {
   await fileServer.init()
 
   fileServer.listen(7358)
-
-  const { metadataHt } = fileServer
 
   const http = new HTTP('localhost:7358')
 

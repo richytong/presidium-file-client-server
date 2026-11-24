@@ -24,42 +24,17 @@ const errorHandler = require("./errorHandler")
  *
  * new FileServer(options {
  *   dir: string,
- *   databasePath: string,
- *   metadataTableName: string,
- *   metadataTableInitialLength: number,
- *   metadataTableItemSize: number,
  *   cors: boolean,
+ *   delimiter: string,
  * }, ...handlers Array<HttpHandler>) -> FileServer
  * ```
  */
 class FileServer {
   constructor(options, ...handlers) {
     this.dir = options.dir
-    this.databasePath = options.databasePath
-    this.metadataTableName = options.metadataTableName ?? "Metadata"
-    this.metadataTableInitialLength = options.manifestTableInitialLength ?? 1048576
-    this.metadataTableItemSize = options.manifestTableItemSize ?? 1024
     this.cors = options.cors
+    this.delimiter = options.delimiter ?? ""
     this.handlers = handlers
-  }
-
-  /**
-   * @name init
-   *
-   * @docs
-   * ```specscript
-   * init() -> Promise<>
-   * ```
-   */
-  async init() {
-    const metadataHt = new DiskHashTable({
-      storagePath: `${this.databasePath}/${this.metadataTableName}/storage`,
-      headerPath: `${this.databasePath}/${this.metadataTableName}/header`,
-      initialLength: this.metadataTableInitialLength,
-      itemSize: this.metadataTableItemSize,
-    })
-    await metadataHt.init()
-    this.metadataHt = metadataHt
 
     const router = tryCatch(switchCase(
       request => request.path == "/health",
@@ -99,6 +74,9 @@ class FileServer {
     this.server = server
   }
 
+  async init() {
+  }
+
   /**
    * @name listen
    *
@@ -121,7 +99,6 @@ class FileServer {
    * ```
    */
   close() {
-    this.metadataHt.close()
     this.server.close()
   }
 }

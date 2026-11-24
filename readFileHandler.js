@@ -4,6 +4,7 @@
 
 require("rubico/global")
 const fs = require("fs")
+const { access, open } = require("fs/promises")
 const os = { path: require("path") }
 const notFoundHandler = require("./notFoundHandler")
 
@@ -21,11 +22,38 @@ async function readFileHandler(request, response) {
   const relativeFilePath = request.pathSegments.join("/")
   const filePath = os.path.join(this.dir, relativeFilePath)
 
-  const metadataJson = await this.metadataHt.get(filePath)
-  if (metadataJson == null) {
+  try {
+    await access(filePath)
+  } catch {
     return notFoundHandler(request, response)
   }
-  const metadata = JSON.parse(metadataJson)
+
+  const fileHandle = await open(filePath)
+  const stats = await fileHandle.stat()
+
+  let metadataBuffer = Buffer.alloc(0)
+  {
+    let buffer = Buffer.alloc(64)
+    while (!buffer.includes(this.delimiter)) {
+      let position = stats.size - metadataBuffer.length - buffer.length
+      if (position < 0) {
+        buffer = Buffer.alloc(stats.size - metadataBuffer.length)
+        position = 0
+      }
+      await fileHandle.read(buffer, {
+        offset: 0,
+        length: buffer.length,
+        position,
+      })
+      metadataBuffer = Buffer.concat([buffer, metadataBuffer])
+    }
+    metadataBuffer =
+      metadataBuffer.slice(metadataBuffer.indexOf(this.delimiter) + 1, metadataBuffer.length)
+  }
+
+  const metadata = JSON.parse(metadataBuffer.toString("utf8"))
+
+  await fileHandle.close()
 
   const responseHeaders = {
     "Content-Length": metadata.ContentLength,
@@ -38,7 +66,10 @@ async function readFileHandler(request, response) {
     responseHeaders["Content-Encoding"] = metadata.ContentEncoding
   }
 
-  const fileReadStream = fs.createReadStream(filePath)
+  const fileReadStream = fs.createReadStream(filePath, {
+    start: 0,
+    end: stats.size - metadataBuffer.length,
+  })
   response.writeHead(200, responseHeaders)
   fileReadStream.pipe(response)
   fileReadStream.on("end", thunkify.call(response.end, response))
