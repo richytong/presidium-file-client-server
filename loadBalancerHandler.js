@@ -40,12 +40,12 @@ function getClient(serverIp) {
 async function loadBalancerHandler(request, response) {
   const fileUrl = request.url
 
-  let index = this.hash(fileUrl, this.serverIps.length)
+  let index = this.hash(fileUrl, this.serverAddresses.length)
   if (typeof index.then == "function") {
     index = await index
   }
 
-  const serverIpOrIps = this.serverIps[index]
+  const serverIpOrIps = this.serverAddresses[index]
 
   if (Array.isArray(serverIpOrIps)) {
     const passthroughStreams = []

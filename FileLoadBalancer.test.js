@@ -23,7 +23,7 @@ async function test0() {
 
   const loadBalancer = new FileLoadBalancer(
     async () => 0,
-    { serverIps: ["http://localhost:7358"] }
+    { serverAddresses: ["http://localhost:7358"] }
   )
 
   loadBalancer.listen(6333)
@@ -135,7 +135,7 @@ async function test1() {
   let p = 0
 
   const loadBalancer = new FileLoadBalancer(hash, {
-    serverIps: [
+    serverAddresses: [
       "localhost:7358",
       "localhost:7359",
       "localhost:7360",
@@ -249,7 +249,7 @@ async function test2() {
   server3.listen(7363)
 
   const loadBalancer = new FileLoadBalancer({
-    serverIps: [[
+    serverAddresses: [[
       "localhost:7361",
       "localhost:7362",
       "localhost:7363",
@@ -317,7 +317,7 @@ async function test3() {
   server3.listen(7366)
 
   const loadBalancer = new FileLoadBalancer({
-    serverIps: [[
+    serverAddresses: [[
       "localhost:7364",
       "localhost:7365",
       "localhost:7366",

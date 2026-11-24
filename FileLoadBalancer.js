@@ -20,14 +20,33 @@ const defaultHash = require("./hash")
  * type HttpHandler(http.ClientRequest, http.ServerResponse) -> Promise<>|undefined
  *
  * new FileLoadBalancer(options {
- *   serverIps: Array<string>|Array<Array<string>>,
+ *   serverAddresses: Array<string>|Array<Array<string>>,
  * }, ...handlers Arguments<HttpHandler>) -> FileLoadBalancer
  *
- * hash(fileUrl string, serverIpsLength number) -> serverIndex Promise|number
+ * hash(fileUrl string, serverAddressesLength number) -> serverIndex Promise|number
  *
  * new FileLoadBalancer(hash, options {
- *   serverIps: Array<string>|Array<Array<string>>,
+ *   serverAddresses: Array<string>|Array<Array<string>>,
  * }, ...handlers Arguments<HttpHandler>) -> FileLoadBalancer
+ * ```
+ *
+ * Presidium FileLoadBalancer class. Creates a file load balancer server.
+ *
+ * Arguments:
+ *   * `options`
+ *     * `serverAddresses` - `Array<string>|Array<Array<string>>` - the server addresses to load balance. An array of arrays of server addresses means the request data should be replicated across the array of server addresses indicated by the hash function.
+ *
+ * Return:
+ *   * `server` - [`DatabaseLoadBalancer`](/docs/DatabaseLoadBalancer) - a DatabaseLoadBalancer instance.
+ *
+ * ```javascript
+ * const server = new DatabaseLoadBalancer({
+ *   serverAddresses: ["10.0.0.1:8080", "10.0.0.2:8080", "10.0.0.3:8080"],
+ * })
+ *
+ * server.listen(8080, () => {
+ *   console.log("Database load balancer server listening on port 8080")
+ * })
  * ```
  */
 class FileLoadBalancer {
@@ -39,7 +58,7 @@ class FileLoadBalancer {
       handlers.shift(options)
       options = hash
     }
-    this.serverIps = options.serverIps
+    this.serverAddresses = options.serverAddresses ?? options.serverAddresses
     this.handlers = handlers
     this.clients = new Map()
     this.closed = false
