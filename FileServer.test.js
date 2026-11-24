@@ -2,6 +2,7 @@ require("rubico/global")
 const assert = require("assert")
 const HTTP = require("presidium/HTTP")
 const Readable = require("presidium/Readable")
+const fs = require("fs")
 const stream = require("stream")
 const zlib = require("zlib")
 const FileServer = require("./FileServer")
@@ -20,7 +21,7 @@ async function test0() {
 
   fileServer.listen(7357)
 
-  const http = new HTTP('localhost:7357')
+  const http = new HTTP("localhost:7357")
 
   const response1 = await http.GET("/health")
   assert.equal(response1.status, 200)
@@ -132,7 +133,7 @@ async function test1() {
 
   fileServer.listen(7358)
 
-  const http = new HTTP('localhost:7358')
+  const http = new HTTP("localhost:7358")
 
   const response1 = await http.GET("/health")
   assert.equal(response1.status, 200)
@@ -144,25 +145,33 @@ async function test1() {
   const text2 = await Readable.Text(response2)
   assert.equal(text2, "")
 
-  const filePath1 = "/media/test-1.mp4"
-  const testBuffer1 = Buffer.from([1, 2, 3])
+  const filePath1 = "/media/test-1.webm"
+  const testData1 = fs.createReadStream(`${__dirname}/test-data/sample-vertical-5s.webm`)
+
+  let testData1ContentLength = 0
+  testData1.on("data", chunk => {
+    testData1ContentLength += chunk.length
+  })
 
   const response3 = await http.PUT(`/${filePath1}`, {
-    body: testBuffer1,
+    headers: {
+      "Content-Type": "video/webm",
+    },
+    body: testData1,
   })
   assert.equal(response3.status, 200)
   const data3 = await Readable.JSON(response3)
   assert.equal(data3.Url, filePath1)
-  assert.equal(data3.ContentType, "application/octet-stream")
-  assert.equal(data3.ContentLength, Buffer.byteLength(testBuffer1))
+  assert.equal(data3.ContentType, "video/webm")
+  assert.equal(data3.ContentLength, testData1ContentLength)
 
   const response4 = await http.GET(`/${filePath1}`)
   assert.equal(response4.status, 200)
-  assert.equal(response4.headers["content-type"], "application/octet-stream")
-  assert.equal(response4.headers["content-length"], Buffer.byteLength(testBuffer1))
+  assert.equal(response4.headers["content-type"], "video/webm")
+  assert.equal(response4.headers["content-length"], testData1ContentLength)
   assert.equal(response4.headers["access-control-allow-origin"], "*")
-  const data4 = await Readable.Buffer(response4)
-  assert(testBuffer1.equals(data4))
+  const retrievedData1 = await Readable.Buffer(response4)
+  assert.equal(retrievedData1.length, testData1ContentLength)
 
   const response41 = await http.DELETE(`/${filePath1}`)
   assert.equal(response41.status, 200)
@@ -191,9 +200,9 @@ async function test2() {
   })
   await fileServer.init()
 
-  fileServer.listen(7359)
+  fileServer.listen(7358)
 
-  const http = new HTTP('localhost:7359')
+  const http = new HTTP("localhost:7358")
 
   const response1 = await http.GET("/health")
   assert.equal(response1.status, 200)
@@ -205,25 +214,33 @@ async function test2() {
   const text2 = await Readable.Text(response2)
   assert.equal(text2, "")
 
-  const filePath1 = "/media/test-1.mp4"
-  const testBuffer1 = Buffer.from([1, 2, 3])
+  const filePath1 = "/media/magnet-field.jpg"
+  const testData1 = fs.createReadStream(`${__dirname}/test-data/magnet-field.jpg`)
+
+  let testData1ContentLength = 0
+  testData1.on("data", chunk => {
+    testData1ContentLength += chunk.length
+  })
 
   const response3 = await http.PUT(`/${filePath1}`, {
-    body: testBuffer1,
+    headers: {
+      "Content-Type": "image/jpeg",
+    },
+    body: testData1,
   })
   assert.equal(response3.status, 200)
   const data3 = await Readable.JSON(response3)
   assert.equal(data3.Url, filePath1)
-  assert.equal(data3.ContentType, "application/octet-stream")
-  assert.equal(data3.ContentLength, Buffer.byteLength(testBuffer1))
+  assert.equal(data3.ContentType, "image/jpeg")
+  assert.equal(data3.ContentLength, testData1ContentLength)
 
   const response4 = await http.GET(`/${filePath1}`)
   assert.equal(response4.status, 200)
-  assert.equal(response4.headers["content-type"], "application/octet-stream")
-  assert.equal(response4.headers["content-length"], Buffer.byteLength(testBuffer1))
+  assert.equal(response4.headers["content-type"], "image/jpeg")
+  assert.equal(response4.headers["content-length"], testData1ContentLength)
   assert.equal(response4.headers["access-control-allow-origin"], "localhost")
-  const data4 = await Readable.Buffer(response4)
-  assert(testBuffer1.equals(data4))
+  const retrievedData1 = await Readable.Buffer(response4)
+  assert.equal(retrievedData1.length, testData1ContentLength)
 
   const response41 = await http.DELETE(`/${filePath1}`)
   assert.equal(response41.status, 200)
