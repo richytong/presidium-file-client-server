@@ -35,6 +35,8 @@ const defaultHash = require("./hash")
  * Arguments:
  *   * `options`
  *     * `serverAddresses` - `Array<string>|Array<Array<string>>` - the server addresses to load balance. An array of arrays of server addresses means the request data should be replicated across the array of server addresses indicated by the hash function.
+ *   * `hash` - `function` - a function that resolves the index of the server address to route a request. Defaults to an MD5 hash function.
+ *   * `handlers` - `Arguments<HttpHandler>` - HTTP handlers that process the request in order before it is processed by the file load balancer server.
  *
  * Return:
  *   * `server` - [`FileLoadBalancer`](/docs/FileLoadBalancer) - a FileLoadBalancer instance.
