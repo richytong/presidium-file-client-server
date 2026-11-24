@@ -109,7 +109,7 @@ class FileLoadBalancer {
    * listen(port number, callback function) -> undefined
    * ```
    *
-   * Start the file load balancer server listening on the specified port with an optional callback function.
+   * Starts the file load balancer server listening on the specified port with an optional callback function.
    *
    * Arguments:
    *   * `port` - `number` - the port on which the file load balancer server will listen.

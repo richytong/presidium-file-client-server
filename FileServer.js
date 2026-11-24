@@ -115,7 +115,7 @@ class FileServer {
    * listen(port number, callback function) -> undefined
    * ```
    *
-   * Start the file server listening on the specified port with an optional callback function.
+   * Starts the file server listening on the specified port with an optional callback function.
    *
    * Arguments:
    *   * `port` - `number` - the port on which the file server will listen.
