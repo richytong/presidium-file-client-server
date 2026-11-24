@@ -24,7 +24,7 @@ const errorHandler = require("./errorHandler")
  *
  * new FileServer(options {
  *   dir: string,
- *   cors: boolean,
+ *   cors: boolean|string,
  *   delimiter: string,
  * }, ...handlers Array<HttpHandler>) -> FileServer
  * ```
@@ -34,7 +34,7 @@ const errorHandler = require("./errorHandler")
  * Arguments:
  *   * `options`
  *     * `dir` - `string` - the absolute path on the machine running the file server to the directory of the file server files.
- *     * `cors` - `boolean` - whether to enable cross-origin resource sharing for all origins.
+ *     * `cors` - `boolean|string` - whether to enable cross-origin resource sharing for all origins. If this value is a string, the value of the string will be provided as the value of the `Access-Control-Allow-Origin` header on all file resources served by the file server.
  *     * `delimiter` - `string` - a character or string that will separate the file data from the metadata during storage.
  *   * `handlers` - `Arguments<HttpHandler>` - HTTP handlers that process the request in order before it is processed by the file server.
  *
