@@ -61,7 +61,7 @@ class FileClient {
    *
    * Arguments:
    *   * `url` - `string` - the URL of the file on the file server.
-   *   * `fileStream` - `stream.Readable` - the file data.
+   *   * `fileStream` - `[stream.Readable](https://nodejs.org/api/stream.html#class-streamreadable)` - the file data.
    *   * `options`
    *     * `ContentType` - `string` - the content type or mime type of the file. Represents the value of the `Content-Type` header of the file served by the file server.
    *     * `ContentEncoding` - `string` - the content encoding of the file. Represents the value of the `Content-Encoding` header of the file served by the file server.
@@ -123,7 +123,7 @@ class FileClient {
    *
    * Return:
    *   * `data` - `Promise<object>`
-   *     * `FileStream` - `stream.Readable` - the file data.
+   *     * `FileStream` - `[stream.Readable](https://nodejs.org/api/stream.html#class-streamreadable)` - the file data.
    *     * `ContentLength` - `number` - the length in bytes of the file data. Represents the value of the `Content-Length` header of the file served by the file server.
    *     * `ContentType` - `string` - the content type or mime type of the file. Represents the value of the `Content-Type` header of the file served by the file server.
    *     * `ContentEncoding` - `string` - the content encoding of the file. Represents the value of the `Content-Encoding` header of the file served by the file server.
