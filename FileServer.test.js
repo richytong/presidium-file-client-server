@@ -160,7 +160,7 @@ async function test1() {
   assert.equal(response4.status, 200)
   assert.equal(response4.headers["content-type"], "application/octet-stream")
   assert.equal(response4.headers["content-length"], Buffer.byteLength(testBuffer1))
-  assert.equal(response4.headers["access-control-allow-origin"], "localhost")
+  assert.equal(response4.headers["access-control-allow-origin"], "*")
   const data4 = await Readable.Buffer(response4)
   assert(testBuffer1.equals(data4))
 
@@ -191,9 +191,9 @@ async function test2() {
   })
   await fileServer.init()
 
-  fileServer.listen(7358)
+  fileServer.listen(7359)
 
-  const http = new HTTP('localhost:7358')
+  const http = new HTTP('localhost:7359')
 
   const response1 = await http.GET("/health")
   assert.equal(response1.status, 200)
@@ -239,8 +239,8 @@ async function test2() {
 }
 
 async function test() {
-  // await test0()
-  // await test1()
+  await test0()
+  await test1()
   await test2()
   console.log("Success")
 }
