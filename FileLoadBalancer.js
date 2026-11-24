@@ -58,7 +58,7 @@ class FileLoadBalancer {
       handlers.shift(options)
       options = hash
     }
-    this.serverAddresses = options.serverAddresses ?? options.serverAddresses
+    this.serverAddresses = options.serverAddresses ?? options.serverIps
     this.handlers = handlers
     this.clients = new Map()
     this.closed = false
