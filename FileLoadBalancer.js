@@ -37,16 +37,23 @@ const defaultHash = require("./hash")
  *     * `serverAddresses` - `Array<string>|Array<Array<string>>` - the server addresses to load balance. An array of arrays of server addresses means the request data should be replicated across the array of server addresses indicated by the hash function.
  *
  * Return:
- *   * `server` - [`DatabaseLoadBalancer`](/docs/DatabaseLoadBalancer) - a DatabaseLoadBalancer instance.
+ *   * `server` - [`FileLoadBalancer`](/docs/FileLoadBalancer) - a FileLoadBalancer instance.
  *
  * ```javascript
- * const server = new DatabaseLoadBalancer({
+ * const server = new FileLoadBalancer({
  *   serverAddresses: ["10.0.0.1:8080", "10.0.0.2:8080", "10.0.0.3:8080"],
  * })
  *
  * server.listen(8080, () => {
- *   console.log("Database load balancer server listening on port 8080")
+ *   console.log("File load balancer server listening on port 8080")
  * })
+ * ```
+ *
+ * ## Requesting a file resource from clients
+ * Files stored on the file servers load balanced by the file load balancer server can be accessed by clients with a GET request to the file load balancer server at the url of the file.
+ *
+ * ```html
+ * <img src="http://your-file-load-balancer-server-ip:8999/assets/your-media.mp4" alt="">
  * ```
  */
 class FileLoadBalancer {
@@ -96,8 +103,21 @@ class FileLoadBalancer {
    *
    * @docs
    * ```specscript
-   * listen(port number) -> ()
-   * listen(port number, callback function) -> ()
+   * listen(port number) -> undefined
+   * listen(port number, callback function) -> undefined
+   * ```
+   *
+   * Start the file load balancer server listening on the specified port with an optional callback function.
+   *
+   * Arguments:
+   *   * `port` - `number` - the port on which the file load balancer server will listen.
+   *   * `callback` - `function` - a callback function to call once the file load balancer server has started listening.
+   *
+   * Return:
+   *   * `undefined`
+   *
+   * ```javascript
+   * server.listen(8080)
    * ```
    */
   listen(port, callback) {
@@ -109,7 +129,19 @@ class FileLoadBalancer {
    *
    * @docs
    * ```specscript
-   * close() -> ()
+   * close() -> undefined
+   * ```
+   *
+   * Closes the file load balancer server.
+   *
+   * Arguments:
+   *   * (none)
+   *
+   * Return:
+   *   * `undefined`
+   *
+   * ```javascript
+   * server.close()
    * ```
    */
   close() {

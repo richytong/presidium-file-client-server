@@ -20,13 +20,41 @@ const errorHandler = require("./errorHandler")
  * ```specscript
  * module http "https://nodejs.org/api/http.html"
  *
- * type HttpHandler(request http.ClientRequest, response http.ServerResponse) -> ()
+ * type HttpHandler(request http.ClientRequest, response http.ServerResponse) -> undefined
  *
  * new FileServer(options {
  *   dir: string,
  *   cors: boolean,
  *   delimiter: string,
  * }, ...handlers Array<HttpHandler>) -> FileServer
+ * ```
+ *
+ * Presidium FileServer class. Creates a file server.
+ *
+ * Arguments:
+ *   * `options`
+ *     * `dir` - `string` - the absolute path on the machine running the file server to the directory of the file server files.
+ *     * `cors` - `boolean` - whether to enable cross-origin resource sharing for all origins.
+ *     * `delimiter` - `string` - a character or string that will separate the file data from the metadata during storage.
+ *
+ * Return:
+ *   * `server` - [`FileServer`](/docs/FileServer) - a FileServer instance.
+ *
+ * ```javascript
+ * const server = new FileServer({
+ *   databasePath: `${__dirname}/file`,
+ * })
+ *
+ * server.listen(8080, () => {
+ *   console.log("File server listening on port 8080")
+ * })
+ * ```
+ *
+ * ## Requesting a file resource from clients
+ * Files stored on the file server can be accessed by clients with a GET request to the file server at the url of the file.
+ *
+ * ```html
+ * <img src="http://your-file-server-ip:8999/assets/your-media.mp4" alt="">
  * ```
  */
 class FileServer {
@@ -82,8 +110,21 @@ class FileServer {
    *
    * @docs
    * ```specscript
-   * listen(port number) -> ()
-   * listen(port number, callback function) -> ()
+   * listen(port number) -> undefined
+   * listen(port number, callback function) -> undefined
+   * ```
+   *
+   * Start the file server listening on the specified port with an optional callback function.
+   *
+   * Arguments:
+   *   * `port` - `number` - the port on which the file server will listen.
+   *   * `callback` - `function` - a callback function to call once the file server has started listening.
+   *
+   * Return:
+   *   * `undefined`
+   *
+   * ```javascript
+   * server.listen(8080)
    * ```
    */
   listen(port, callback) {
@@ -95,7 +136,19 @@ class FileServer {
    *
    * @docs
    * ```specscript
-   * close() -> ()
+   * close() -> undefined
+   * ```
+   *
+   * Closes the file server.
+   *
+   * Arguments:
+   *   * (none)
+   *
+   * Return:
+   *   * `undefined`
+   *
+   * ```javascript
+   * server.close()
    * ```
    */
   close() {
