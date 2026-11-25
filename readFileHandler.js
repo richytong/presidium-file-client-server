@@ -5,6 +5,7 @@
 require("rubico/global")
 const fs = require("fs")
 const os = { path: require("path") }
+const ResponseHeaders = require("./ResponseHeaders")
 const notFoundHandler = require("./notFoundHandler")
 
 /**
@@ -27,23 +28,21 @@ async function readFileHandler(request, response) {
   }
   const metadata = JSON.parse(metadataJson)
 
-  const responseHeaders = {
-    "Content-Length": metadata.ContentLength,
-    "Content-Type": metadata.ContentType,
-    ...this.cors === true ? {
-      'Access-Control-Allow-Origin': '*',
-    } : this.cors ? {
-      'Access-Control-Allow-Origin': this.cors,
-    } : {},
-  }
-  if (metadata.ContentEncoding) {
-    responseHeaders["Content-Encoding"] = metadata.ContentEncoding
-  }
+  const responseHeaders = ResponseHeaders(
+    metadata, this.cors, request.headers["range"])
 
-  const fileReadStream = fs.createReadStream(filePath)
-  response.writeHead(200, responseHeaders)
-  fileReadStream.pipe(response)
-  fileReadStream.on("end", thunkify.call(response.end, response))
+  if (responseHeaders["Content-Range"]) {
+    const [start, end] = request.headers["range"].split("=")[1].split("-").map(Number)
+    const fileReadStream = fs.createReadStream(filePath, { start, end })
+    response.writeHead(200, responseHeaders)
+    fileReadStream.pipe(response)
+    fileReadStream.on("end", thunkify.call(response.end, response))
+  } else {
+    const fileReadStream = fs.createReadStream(filePath)
+    response.writeHead(200, responseHeaders)
+    fileReadStream.pipe(response)
+    fileReadStream.on("end", thunkify.call(response.end, response))
+  }
 }
 
 module.exports = readFileHandler

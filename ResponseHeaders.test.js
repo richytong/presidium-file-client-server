@@ -1,0 +1,86 @@
+const assert = require("assert")
+const ResponseHeaders = require("./ResponseHeaders")
+
+function test0() {
+  const responseHeaders0 = ResponseHeaders({
+    ContentType: "text/plain",
+    ContentLength: 1024,
+  })
+  assert.equal(responseHeaders0["Content-Type"], "text/plain")
+  assert.equal(responseHeaders0["Content-Length"], 1024)
+  assert.equal(responseHeaders0["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders0["Access-Control-Allow-Origin"], null)
+  assert.equal(responseHeaders0["Content-Range"], null)
+
+  const responseHeaders1 = ResponseHeaders({
+    ContentType: "text/plain",
+    ContentLength: 1024,
+    ContentEncoding: "compress",
+  }, true)
+  assert.equal(responseHeaders1["Content-Type"], "text/plain")
+  assert.equal(responseHeaders1["Content-Length"], 1024)
+  assert.equal(responseHeaders1["Content-Encoding"], "compress")
+  assert.equal(responseHeaders1["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders1["Access-Control-Allow-Origin"], "*")
+  assert.equal(responseHeaders1["Content-Range"], null)
+
+  const responseHeaders2 = ResponseHeaders({
+    ContentType: "text/plain",
+    ContentLength: 1024,
+  }, "http://localhost:8080")
+  assert.equal(responseHeaders2["Content-Type"], "text/plain")
+  assert.equal(responseHeaders2["Content-Length"], 1024)
+  assert.equal(responseHeaders2["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders2["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders2["Content-Range"], null)
+
+  const responseHeaders3 = ResponseHeaders({
+    ContentType: "video/mp4",
+    ContentLength: 1048576,
+  }, "http://localhost:8080", "bytes=0-1000")
+  assert.equal(responseHeaders3["Content-Type"], "video/mp4")
+  assert.equal(responseHeaders3["Content-Length"], 1000)
+  assert.equal(responseHeaders3["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders3["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders3["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders3["Content-Range"], "bytes 0-1000/1048576")
+
+  assert.throws(() => {
+    ResponseHeaders({
+      ContentType: "video/mp4",
+      ContentLength: 1048576,
+    }, "http://localhost:8080", "x=0-1000")
+  }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
+
+  assert.throws(() => {
+    ResponseHeaders({
+      ContentType: "video/mp4",
+      ContentLength: 1048576,
+    }, "http://localhost:8080", "bytes=0-")
+  }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
+
+  assert.throws(() => {
+    ResponseHeaders({
+      ContentType: "video/mp4",
+      ContentLength: 1048576,
+    }, "http://localhost:8080", "bytes=-1-1000")
+  }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
+
+  assert.throws(() => {
+    ResponseHeaders({
+      ContentType: "video/mp4",
+      ContentLength: 1048576,
+    }, "http://localhost:8080", "bytes=1048000-1049000")
+  }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
+}
+
+function test() {
+  test0()
+  console.log("Success")
+}
+
+if (process.argv[1] == __filename) {
+  test()
+}
+
+module.exports = test

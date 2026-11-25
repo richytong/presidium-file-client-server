@@ -46,10 +46,23 @@ async function test0() {
   assert.equal(data3.ContentType, "application/octet-stream")
   assert.equal(data3.ContentLength, Buffer.byteLength(testBuffer1))
 
+  {
+    const response = await http.HEAD(`/${filePath1}`)
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "application/octet-stream")
+    assert.equal(response.headers["content-length"], Buffer.byteLength(testBuffer1))
+    assert.equal(response.headers["access-control-allow-origin"], null)
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    const message = await Readable.Text(response)
+    assert.equal(message.length, 0)
+  }
+
   const response4 = await http.GET(`/${filePath1}`)
   assert.equal(response4.status, 200)
   assert.equal(response4.headers["content-type"], "application/octet-stream")
   assert.equal(response4.headers["content-length"], Buffer.byteLength(testBuffer1))
+  assert.equal(response4.headers["access-control-allow-origin"], null)
+  assert.equal(response4.headers["accept-ranges"], "bytes")
   const data4 = await Readable.Buffer(response4)
   assert(testBuffer1.equals(data4))
 
@@ -166,13 +179,43 @@ async function test1() {
   assert.equal(data3.ContentType, "video/webm")
   assert.equal(data3.ContentLength, testData1ContentLength)
 
+  {
+    const response = await http.HEAD(`/${filePath1}`)
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], testData1ContentLength)
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], null)
+    const message = await Readable.Text(response)
+    assert.equal(message.length, 0)
+  }
+
   const response4 = await http.GET(`/${filePath1}`)
   assert.equal(response4.status, 200)
   assert.equal(response4.headers["content-type"], "video/webm")
   assert.equal(response4.headers["content-length"], testData1ContentLength)
   assert.equal(response4.headers["access-control-allow-origin"], "*")
+  assert.equal(response4.headers["accept-ranges"], "bytes")
+  assert.equal(response4.headers["content-range"], null)
   const retrievedData1 = await Readable.Buffer(response4)
   assert.equal(retrievedData1.length, testData1ContentLength)
+
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": "bytes=0-1000",
+      },
+    })
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], "1000")
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes 0-1000/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, 1000)
+  }
 
   const response41 = await http.DELETE(`/${filePath1}`)
   assert.equal(response41.status, 200)
@@ -235,11 +278,23 @@ async function test2() {
   assert.equal(data3.ContentType, "image/jpeg")
   assert.equal(data3.ContentLength, testData1ContentLength)
 
+  {
+    const response = await http.HEAD(`/${filePath1}`)
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "image/jpeg")
+    assert.equal(response.headers["content-length"], testData1ContentLength)
+    assert.equal(response.headers["access-control-allow-origin"], "localhost")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    const message = await Readable.Text(response)
+    assert.equal(message.length, 0)
+  }
+
   const response4 = await http.GET(`/${filePath1}`)
   assert.equal(response4.status, 200)
   assert.equal(response4.headers["content-type"], "image/jpeg")
   assert.equal(response4.headers["content-length"], testData1ContentLength)
   assert.equal(response4.headers["access-control-allow-origin"], "localhost")
+  assert.equal(response4.headers["accept-ranges"], "bytes")
   const retrievedData1 = await Readable.Buffer(response4)
   assert.equal(retrievedData1.length, testData1ContentLength)
 

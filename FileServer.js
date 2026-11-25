@@ -8,6 +8,7 @@ const { statfs } = require("fs/promises")
 const DiskHashTable = require("presidium/DiskHashTable")
 const healthCheckHandler = require("./healthCheckHandler")
 const optionsHandler = require("./optionsHandler")
+const headFileHandler = require("./headFileHandler")
 const readFileHandler = require("./readFileHandler")
 const writeFileHandler = require("./writeFileHandler")
 const deleteFileHandler = require("./deleteFileHandler")
@@ -76,6 +77,9 @@ class FileServer {
 
       request => request.method == "OPTIONS",
       optionsHandler,
+
+      request => request.method == "HEAD",
+      curry.call(headFileHandler, this, __, __),
 
       request => request.method == "PUT",
       curry.call(writeFileHandler, this, __, __),
