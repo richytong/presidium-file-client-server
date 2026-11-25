@@ -56,6 +56,28 @@ function test0() {
   assert.equal(responseHeaders4["Access-Control-Allow-Origin"], "http://localhost:8080")
   assert.equal(responseHeaders4["Content-Range"], "bytes 0-10000/1048576")
 
+  const responseHeaders5 = ResponseHeaders({
+    ContentType: "video/mp4",
+    ContentLength: 1048576,
+  }, "http://localhost:8080", "bytes=10000-", 10000)
+  assert.equal(responseHeaders5["Content-Type"], "video/mp4")
+  assert.equal(responseHeaders5["Content-Length"], 10000)
+  assert.equal(responseHeaders5["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders5["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders5["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders5["Content-Range"], "bytes 10000-20000/1048576")
+
+  const responseHeaders6 = ResponseHeaders({
+    ContentType: "video/mp4",
+    ContentLength: 1048576,
+  }, "http://localhost:8080", "bytes=1048000-", 10000)
+  assert.equal(responseHeaders6["Content-Type"], "video/mp4")
+  assert.equal(responseHeaders6["Content-Length"], 576)
+  assert.equal(responseHeaders6["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders6["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders6["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders6["Content-Range"], "bytes 1048000-1048576/1048576")
+
   assert.throws(() => {
     ResponseHeaders({
       ContentType: "video/mp4",

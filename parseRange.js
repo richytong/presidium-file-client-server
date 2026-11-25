@@ -13,7 +13,10 @@
 function parseRange(range, contentLength, defaultRangeEnd) {
   let [start, end] = range.split("=")[1].split("-").map(Number)
   if (end === 0) {
-    end = Math.min(contentLength, defaultRangeEnd)
+    end = start + defaultRangeEnd
+    if (end > contentLength) {
+      end = contentLength
+    }
   }
   return [start, end]
 }
