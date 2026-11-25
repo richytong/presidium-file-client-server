@@ -18,6 +18,7 @@ async function test0() {
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
   })
+  await fileServer.init()
 
   fileServer.listen(7357)
 

@@ -4,6 +4,7 @@
 
 require("rubico/global")
 const http = require("http")
+const { statfs } = require("fs/promises")
 const DiskHashTable = require("presidium/DiskHashTable")
 const healthCheckHandler = require("./healthCheckHandler")
 const optionsHandler = require("./optionsHandler")
@@ -45,6 +46,7 @@ const errorHandler = require("./errorHandler")
  * const server = new FileServer({
  *   databasePath: `${__dirname}/file`,
  * })
+ * await server.init()
  *
  * server.listen(8080, () => {
  *   console.log("File server listening on port 8080")
@@ -57,6 +59,9 @@ const errorHandler = require("./errorHandler")
  * ```html
  * <img src="http://your-file-server-ip:8999/assets/your-media.mp4" alt="">
  * ```
+ *
+ * ## Metadata database file
+ * A metadata database file is created to store metadata about the files. The metadata database file is always located at `<dir>/__metadata`
  */
 class FileServer {
   constructor(options, ...handlers) {
@@ -103,7 +108,40 @@ class FileServer {
     this.server = server
   }
 
+  /**
+   * @name init
+   *
+   * @docs
+   * ```specscript
+   * init() -> Promise<>
+   * ```
+   *
+   * Initializes the file server.
+   *
+   * Arguments:
+   *   * (none)
+   *
+   * Return:
+   *   * Empty promise.
+   *
+   * ```javascript
+   * await server.init()
+   * ```
+   */
   async init() {
+    const stats = await statfs("/")
+    const totalBytes = stats.bsize * stats.blocks
+    const itemSize = 9216
+    const initialLength = Math.floor(totalBytes / itemSize)
+
+    const metadataHt = new DiskHashTable({
+      storagePath: `${this.dir}/__metadata/storage`,
+      headerPath: `${this.dir}/__metadata/header`,
+      initialLength,
+      itemSize,
+    })
+    await metadataHt.init()
+    this.metadataHt = metadataHt
   }
 
   /**
@@ -153,6 +191,7 @@ class FileServer {
    * ```
    */
   close() {
+    this.metadataHt.close()
     this.server.close()
   }
 }
