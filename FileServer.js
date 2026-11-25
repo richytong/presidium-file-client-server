@@ -61,7 +61,7 @@ const errorHandler = require("./errorHandler")
  * ```
  *
  * ## Metadata database file
- * A metadata database file is created to store metadata about the files. The metadata database file is always located at `<dir>/__metadata`
+ * A metadata database file is created to store metadata about the files. The metadata database file is always located at `<dir>/__metadata`.
  */
 class FileServer {
   constructor(options, ...handlers) {
