@@ -22,6 +22,7 @@
     "loadBalancerHandler.js",
     "notFoundHandler.js",
     "optionsHandler.js",
+    "parseRange.js",
     "readFileHandler.js",
     "writeFileHandler.js"
   ],

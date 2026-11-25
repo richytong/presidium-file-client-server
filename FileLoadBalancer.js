@@ -55,7 +55,9 @@ const defaultHash = require("./hash")
  * Files stored on the file servers load balanced by the file load balancer server can be accessed by clients with a GET request to the file load balancer server at the url of the file.
  *
  * ```html
- * <img src="http://your-file-load-balancer-server-ip:8999/assets/your-media.mp4" alt="">
+ * <img src="http://your-file-server-ip:8999/assets/your-image.jpg" alt="">
+ *
+ * <video src="http://your-file-server-ip:8999/assets/your-media.mp4">
  * ```
  */
 class FileLoadBalancer {

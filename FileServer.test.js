@@ -217,6 +217,22 @@ async function test1() {
     assert.equal(retrievedData.length, 1000)
   }
 
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": "bytes=0-",
+      },
+    })
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], `${testData1ContentLength}`)
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes 0-${testData1ContentLength}/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, testData1ContentLength)
+  }
+
   const response41 = await http.DELETE(`/${filePath1}`)
   assert.equal(response41.status, 200)
   const message41 = await Readable.Text(response41)
@@ -240,13 +256,129 @@ async function test2() {
   const fileServer = new FileServer({
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
+    cors: true,
+    defaultRangeEnd: 5000,
+  })
+  await fileServer.init()
+
+  fileServer.listen(7359)
+
+  const http = new HTTP("localhost:7359")
+
+  const response1 = await http.GET("/health")
+  assert.equal(response1.status, 200)
+  const text1 = await Readable.Text(response1)
+  assert.equal(text1, "OK")
+
+  const response2 = await http.OPTIONS("/")
+  assert.equal(response2.status, 204)
+  const text2 = await Readable.Text(response2)
+  assert.equal(text2, "")
+
+  const filePath1 = "/media/test-1.webm"
+  const testData1 = fs.createReadStream(`${__dirname}/test-data/sample-vertical-5s.webm`)
+
+  let testData1ContentLength = 0
+  testData1.on("data", chunk => {
+    testData1ContentLength += chunk.length
+  })
+
+  const response3 = await http.PUT(`/${filePath1}`, {
+    headers: {
+      "Content-Type": "video/webm",
+    },
+    body: testData1,
+  })
+  assert.equal(response3.status, 200)
+  const data3 = await Readable.JSON(response3)
+  assert.equal(data3.Url, filePath1)
+  assert.equal(data3.ContentType, "video/webm")
+  assert.equal(data3.ContentLength, testData1ContentLength)
+
+  {
+    const response = await http.HEAD(`/${filePath1}`)
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], testData1ContentLength)
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], null)
+    const message = await Readable.Text(response)
+    assert.equal(message.length, 0)
+  }
+
+  const response4 = await http.GET(`/${filePath1}`)
+  assert.equal(response4.status, 200)
+  assert.equal(response4.headers["content-type"], "video/webm")
+  assert.equal(response4.headers["content-length"], testData1ContentLength)
+  assert.equal(response4.headers["access-control-allow-origin"], "*")
+  assert.equal(response4.headers["accept-ranges"], "bytes")
+  assert.equal(response4.headers["content-range"], null)
+  const retrievedData1 = await Readable.Buffer(response4)
+  assert.equal(retrievedData1.length, testData1ContentLength)
+
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": "bytes=0-1000",
+      },
+    })
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], "1000")
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes 0-1000/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, 1000)
+  }
+
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": "bytes=0-",
+      },
+    })
+    assert.equal(response.status, 200)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], "5000")
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes 0-5000/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, 5000)
+  }
+
+  const response41 = await http.DELETE(`/${filePath1}`)
+  assert.equal(response41.status, 200)
+  const message41 = await Readable.Text(response41)
+  assert.equal(message41, "OK")
+
+  const response42 = await http.DELETE(`/${filePath1}`)
+  assert.equal(response42.status, 404)
+  const message42 = await Readable.Text(response42)
+  assert.equal(message42, "Not Found")
+
+  fileServer.close()
+}
+
+async function test3() {
+  try {
+    await fs.promises.rm(`${__dirname}/database`, { recursive: true })
+    await fs.promises.rm(`${__dirname}/file-root`, { recursive: true })
+  } catch {
+  }
+
+  const fileServer = new FileServer({
+    dir: `${__dirname}/file-root/test-dir`,
+    databasePath: `${__dirname}/database`,
     cors: "localhost",
   })
   await fileServer.init()
 
-  fileServer.listen(7358)
+  fileServer.listen(7360)
 
-  const http = new HTTP("localhost:7358")
+  const http = new HTTP("localhost:7360")
 
   const response1 = await http.GET("/health")
   assert.equal(response1.status, 200)
@@ -315,6 +447,7 @@ async function test() {
   await test0()
   await test1()
   await test2()
+  await test3()
   console.log("Success")
 }
 

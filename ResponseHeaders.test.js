@@ -37,7 +37,7 @@ function test0() {
   const responseHeaders3 = ResponseHeaders({
     ContentType: "video/mp4",
     ContentLength: 1048576,
-  }, "http://localhost:8080", "bytes=0-1000")
+  }, "http://localhost:8080", "bytes=0-1000", 10000)
   assert.equal(responseHeaders3["Content-Type"], "video/mp4")
   assert.equal(responseHeaders3["Content-Length"], 1000)
   assert.equal(responseHeaders3["Accept-Ranges"], "bytes")
@@ -45,18 +45,22 @@ function test0() {
   assert.equal(responseHeaders3["Access-Control-Allow-Origin"], "http://localhost:8080")
   assert.equal(responseHeaders3["Content-Range"], "bytes 0-1000/1048576")
 
-  assert.throws(() => {
-    ResponseHeaders({
-      ContentType: "video/mp4",
-      ContentLength: 1048576,
-    }, "http://localhost:8080", "x=0-1000")
-  }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
+  const responseHeaders4 = ResponseHeaders({
+    ContentType: "video/mp4",
+    ContentLength: 1048576,
+  }, "http://localhost:8080", "bytes=0-", 10000)
+  assert.equal(responseHeaders4["Content-Type"], "video/mp4")
+  assert.equal(responseHeaders4["Content-Length"], 10000)
+  assert.equal(responseHeaders4["Accept-Ranges"], "bytes")
+  assert.equal(responseHeaders4["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders4["Access-Control-Allow-Origin"], "http://localhost:8080")
+  assert.equal(responseHeaders4["Content-Range"], "bytes 0-10000/1048576")
 
   assert.throws(() => {
     ResponseHeaders({
       ContentType: "video/mp4",
       ContentLength: 1048576,
-    }, "http://localhost:8080", "bytes=0-")
+    }, "http://localhost:8080", "x=0-1000")
   }, { name: "Error", message: "Bad Request: Invalid range.", code: 400 })
 
   assert.throws(() => {

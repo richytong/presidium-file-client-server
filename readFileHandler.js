@@ -7,6 +7,7 @@ const fs = require("fs")
 const os = { path: require("path") }
 const ResponseHeaders = require("./ResponseHeaders")
 const notFoundHandler = require("./notFoundHandler")
+const parseRange = require("./parseRange")
 
 /**
  * @name readFileHandler
@@ -29,10 +30,11 @@ async function readFileHandler(request, response) {
   const metadata = JSON.parse(metadataJson)
 
   const responseHeaders = ResponseHeaders(
-    metadata, this.cors, request.headers["range"])
+    metadata, this.cors, request.headers["range"], this.defaultRangeEnd)
 
   if (responseHeaders["Content-Range"]) {
-    const [start, end] = request.headers["range"].split("=")[1].split("-").map(Number)
+    const [start, end] = parseRange(
+      request.headers["range"], metadata.ContentLength, this.defaultRangeEnd)
     const fileReadStream = fs.createReadStream(filePath, { start, end })
     response.writeHead(200, responseHeaders)
     fileReadStream.pipe(response)
