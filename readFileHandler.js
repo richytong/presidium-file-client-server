@@ -36,7 +36,7 @@ async function readFileHandler(request, response) {
     const [start, end] = parseRange(
       request.headers["range"], metadata.ContentLength, this.defaultRangeEnd)
     const fileReadStream = fs.createReadStream(filePath, { start, end })
-    response.writeHead(200, responseHeaders)
+    response.writeHead(206, responseHeaders)
     fileReadStream.pipe(response)
     fileReadStream.on("end", thunkify.call(response.end, response))
   } else {

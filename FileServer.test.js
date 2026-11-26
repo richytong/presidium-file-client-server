@@ -207,7 +207,7 @@ async function test1() {
         "Range": "bytes=0-1000",
       },
     })
-    assert.equal(response.status, 200)
+    assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
     assert.equal(response.headers["content-length"], "1000")
     assert.equal(response.headers["access-control-allow-origin"], "*")
@@ -223,7 +223,7 @@ async function test1() {
         "Range": "bytes=0-",
       },
     })
-    assert.equal(response.status, 200)
+    assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
     assert.equal(response.headers["content-length"], `${testData1ContentLength}`)
     assert.equal(response.headers["access-control-allow-origin"], "*")
@@ -323,7 +323,7 @@ async function test2() {
         "Range": "bytes=0-1000",
       },
     })
-    assert.equal(response.status, 200)
+    assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
     assert.equal(response.headers["content-length"], "1000")
     assert.equal(response.headers["access-control-allow-origin"], "*")
@@ -339,12 +339,28 @@ async function test2() {
         "Range": "bytes=0-",
       },
     })
-    assert.equal(response.status, 200)
+    assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
     assert.equal(response.headers["content-length"], "5000")
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
     assert.equal(response.headers["content-range"], `bytes 0-5000/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, 5000)
+  }
+
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": "bytes=3333-",
+      },
+    })
+    assert.equal(response.status, 206)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], "5000")
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes 3333-8333/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
     assert.equal(retrievedData.length, 5000)
   }
