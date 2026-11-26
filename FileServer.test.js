@@ -209,12 +209,12 @@ async function test1() {
     })
     assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
-    assert.equal(response.headers["content-length"], "1000")
+    assert.equal(response.headers["content-length"], "1001")
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
     assert.equal(response.headers["content-range"], `bytes 0-1000/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
-    assert.equal(retrievedData.length, 1000)
+    assert.equal(retrievedData.length, 1001)
   }
 
   {
@@ -228,7 +228,7 @@ async function test1() {
     assert.equal(response.headers["content-length"], `${testData1ContentLength}`)
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
-    assert.equal(response.headers["content-range"], `bytes 0-${testData1ContentLength}/${testData1ContentLength}`)
+    assert.equal(response.headers["content-range"], `bytes 0-${testData1ContentLength - 1}/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
     assert.equal(retrievedData.length, testData1ContentLength)
   }
@@ -257,7 +257,7 @@ async function test2() {
     dir: `${__dirname}/file-root/test-dir`,
     databasePath: `${__dirname}/database`,
     cors: true,
-    defaultRangeEnd: 5000,
+    defaultRangeLength: 5000,
   })
   await fileServer.init()
 
@@ -325,12 +325,12 @@ async function test2() {
     })
     assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
-    assert.equal(response.headers["content-length"], "1000")
+    assert.equal(response.headers["content-length"], "1001")
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
     assert.equal(response.headers["content-range"], `bytes 0-1000/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
-    assert.equal(retrievedData.length, 1000)
+    assert.equal(retrievedData.length, 1001)
   }
 
   {
@@ -341,12 +341,12 @@ async function test2() {
     })
     assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
-    assert.equal(response.headers["content-length"], "5000")
+    assert.equal(response.headers["content-length"], "5001")
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
     assert.equal(response.headers["content-range"], `bytes 0-5000/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
-    assert.equal(retrievedData.length, 5000)
+    assert.equal(retrievedData.length, 5001)
   }
 
   {
@@ -357,12 +357,28 @@ async function test2() {
     })
     assert.equal(response.status, 206)
     assert.equal(response.headers["content-type"], "video/webm")
-    assert.equal(response.headers["content-length"], "5000")
+    assert.equal(response.headers["content-length"], "5001")
     assert.equal(response.headers["access-control-allow-origin"], "*")
     assert.equal(response.headers["accept-ranges"], "bytes")
     assert.equal(response.headers["content-range"], `bytes 3333-8333/${testData1ContentLength}`)
     const retrievedData = await Readable.Buffer(response)
-    assert.equal(retrievedData.length, 5000)
+    assert.equal(retrievedData.length, 5001)
+  }
+
+  {
+    const response = await http.GET(`/${filePath1}`, {
+      headers: {
+        "Range": `bytes=${testData1ContentLength - 2000 - 1}-`,
+      },
+    })
+    assert.equal(response.status, 206)
+    assert.equal(response.headers["content-type"], "video/webm")
+    assert.equal(response.headers["content-length"], "2001")
+    assert.equal(response.headers["access-control-allow-origin"], "*")
+    assert.equal(response.headers["accept-ranges"], "bytes")
+    assert.equal(response.headers["content-range"], `bytes ${testData1ContentLength - 2000 - 1}-${testData1ContentLength - 1}/${testData1ContentLength}`)
+    const retrievedData = await Readable.Buffer(response)
+    assert.equal(retrievedData.length, 2001)
   }
 
   const response41 = await http.DELETE(`/${filePath1}`)

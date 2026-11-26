@@ -9,7 +9,7 @@ const parseRange = require("./parseRange")
  *   metadata { ContentLength: number, ContentType: string },
  *   cors boolean|string,
  *   range string,
- *   defaultRangeEnd number
+ *   defaultRangeLength number
  * ) -> responseHeaders {
  *   "Content-Length": number,
  *   "Content-Type": string,
@@ -19,7 +19,7 @@ const parseRange = require("./parseRange")
  * }
  * ```
  */
-function ResponseHeaders(metadata, cors, range, defaultRangeEnd) {
+function ResponseHeaders(metadata, cors, range, defaultRangeLength) {
   const responseHeaders = {
     "Content-Length": metadata.ContentLength,
     "Content-Type": metadata.ContentType,
@@ -43,15 +43,10 @@ function ResponseHeaders(metadata, cors, range, defaultRangeEnd) {
       throw error
     }
     const [start, end] = parseRange(
-      range, metadata.ContentLength, defaultRangeEnd)
-    if (end > metadata.ContentLength) {
-      const error = new Error("Bad Request: Invalid range.")
-      error.code = 400
-      throw error
-    }
+      range, metadata.ContentLength, defaultRangeLength)
     responseHeaders["Content-Range"] =
       `bytes ${start}-${end}/${metadata.ContentLength}`
-    responseHeaders["Content-Length"] = end - start
+    responseHeaders["Content-Length"] = end - start + 1
   }
 
   return responseHeaders

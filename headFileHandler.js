@@ -22,7 +22,7 @@ async function headFileHandler(request, response) {
   const metadata = JSON.parse(metadataJson)
 
   response.writeHead(200, ResponseHeaders(
-    metadata, this.cors, request.headers["range"], this.defaultRangeEnd))
+    metadata, this.cors, request.headers["range"], this.defaultRangeLength))
   response.end()
 }
 

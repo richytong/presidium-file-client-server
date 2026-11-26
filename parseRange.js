@@ -6,17 +6,17 @@
  * parseRange(
  *   range string,
  *   contentLength number,
- *   defaultRangeEnd number
+ *   defaultRangeLength number
  * ) -> [start number, end number]
  * ```
  */
-function parseRange(range, contentLength, defaultRangeEnd) {
+function parseRange(range, contentLength, defaultRangeLength) {
   let [start, end] = range.split("=")[1].split("-").map(Number)
   if (end === 0) {
-    end = start + defaultRangeEnd
-    if (end > contentLength) {
-      end = contentLength
-    }
+    end = start + defaultRangeLength
+  }
+  if (end >= contentLength) {
+    end = contentLength - 1
   }
   return [start, end]
 }

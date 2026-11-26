@@ -28,7 +28,7 @@ const errorHandler = require("./errorHandler")
  *   dir: string,
  *   cors: boolean|string,
  *   delimiter: string,
- *   defaultRangeEnd: number,
+ *   defaultRangeLength: number,
  * }, ...handlers Array<HttpHandler>) -> FileServer
  * ```
  *
@@ -39,7 +39,7 @@ const errorHandler = require("./errorHandler")
  *     * `dir` - `string` - the absolute path on the machine running the file server to the directory of the file server files.
  *     * `cors` - `boolean|string` - whether to enable cross-origin resource sharing for all origins. If this value is a string, the value of the string will be provided as the value of the `Access-Control-Allow-Origin` header on all file resources served by the file server.
  *     * `delimiter` - `string` - a character or string that will separate the file data from the metadata during storage.
- *     * `defaultRangeEnd` - `number` - the default value of the end of the range for range requests. Defaults to 10000000 (10MB).
+ *     * `defaultRangeLength` - `number` - the default value of the end of the range for range requests. Defaults to 10000000 (10MB).
  *   * `handlers` - `Arguments<HttpHandler>` - HTTP handlers that process the request in order before it is processed by the file server.
  *
  * Return:
@@ -74,7 +74,7 @@ class FileServer {
     this.cors = options.cors
     this.delimiter = options.delimiter ?? ""
     this.handlers = handlers
-    this.defaultRangeEnd = options.defaultRangeEnd ?? 10000000
+    this.defaultRangeLength = options.defaultRangeLength ?? 10000000
 
     const router = tryCatch(switchCase(
       request => request.path == "/health",

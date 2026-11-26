@@ -30,11 +30,11 @@ async function readFileHandler(request, response) {
   const metadata = JSON.parse(metadataJson)
 
   const responseHeaders = ResponseHeaders(
-    metadata, this.cors, request.headers["range"], this.defaultRangeEnd)
+    metadata, this.cors, request.headers["range"], this.defaultRangeLength)
 
   if (responseHeaders["Content-Range"]) {
     const [start, end] = parseRange(
-      request.headers["range"], metadata.ContentLength, this.defaultRangeEnd)
+      request.headers["range"], metadata.ContentLength, this.defaultRangeLength)
     const fileReadStream = fs.createReadStream(filePath, { start, end })
     response.writeHead(206, responseHeaders)
     fileReadStream.pipe(response)
